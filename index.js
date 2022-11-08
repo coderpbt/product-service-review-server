@@ -1,12 +1,12 @@
 const express = require('express')
 const app = express()
-const port = process.env.PORT || 4000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 var cors = require('cors')
 require('dotenv').config()
 
 var jwt = require('jsonwebtoken');
 
+const port = process.env.PORT || 4000
 
 
 //middleware 
@@ -39,6 +39,13 @@ async function run() {
       const result = await cursor.toArray()
       res.send(result)
     })
+    app.get('/services/:id', async(req,res)=> {
+      const {id} = req.params;
+      const query = {_id : ObjectId(id)}
+      const result = await fitzeosCollection.findOne(query)
+      res.send(result)
+    })
+
     
   } finally {
 
