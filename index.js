@@ -1,12 +1,13 @@
 const express = require('express')
 const app = express()
+const port = process.env.PORT || 4000
 const { MongoClient, ServerApiVersion } = require('mongodb');
 var cors = require('cors')
 require('dotenv').config()
 
 var jwt = require('jsonwebtoken');
 
-const port = process.env.PORT || 5000
+
 
 //middleware 
 app.use(cors())
@@ -25,21 +26,25 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
   try {
     const fitzeosCollection = client.db("fitzeosUserDb").collection("services");
-    const doc = {
-      title: "Record of a Shriveled Datum",
-      content: "No bytes, no problem. Just insert a document, in MongoDB",
-    }
-    const result = await fitzeosCollection.insertOne(doc);
-    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+    //data 
+    app.get('/services', async(req,res)=> {
+      const query = {}
+      const cursor = fitzeosCollection.find(query)
+      const result = await cursor.limit(3).toArray()
+      res.send(result)
+    })
+    app.get('/servicesall', async(req,res)=> {
+      const query = {}
+      const cursor = fitzeosCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+    })
     
   } finally {
 
   }
 }
 run().catch(console.dir);
-
-
-
 
 
 
