@@ -3,10 +3,11 @@ const app = express()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 var cors = require('cors')
 require('dotenv').config()
-
 var jwt = require('jsonwebtoken');
 
-const port = process.env.PORT || 4000
+const port = process.env.PORT || 4000;
+
+
 
 
 //middleware 
@@ -47,11 +48,34 @@ async function run() {
       res.send(result)
     })
     //ui to db data
+    app.get('/reviews', async(req,res) =>{
+      let query = {};
+      if (req.query.email) {
+        query = {
+          email : req.query.email
+        }
+      }
+
+      const cursor = fitzeosReviewCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+      console.log(req.query.email);
+    })
+    
     app.post('/reviews', async(req,res)=> {
       const review = req.body;
       const result = await fitzeosReviewCollection.insertOne(review)
       res.send(result)
+      console.log(result);
     })
+    app.get('/reviews', async(req,res)=> {
+      const query = {}
+      const cursor = fitzeosReviewCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+
+    
 
     
   } finally {
