@@ -76,7 +76,8 @@ async function run() {
     })
     app.get('/reviews', async (req, res) => {
       const query = {}
-      const cursor = fitzeosReviewCollection.find(query)
+      const sort = { time : time };
+      const cursor = fitzeosReviewCollection.find(query).sort(sort)
       const result = await cursor.toArray()
       res.send(result)
     })
@@ -89,6 +90,25 @@ async function run() {
       res.send(result)
 
     })
+
+      //data update user
+      app.put('/reviews/:id', async (req,res) => {
+        const id = req.params.id;
+        const filter = { _id : ObjectId(id)};
+        const user = req.body;
+        const option = {upsert : true};
+
+        const updsteUser = {
+          $set : {
+            name : user.name,
+            review : user.review
+          }
+        }
+
+        const result = await userCollection.updateOne(filter,updsteUser,option)
+        console.log(updsteUser);
+        res.send(result)
+      })
 
 
     //delete Review
