@@ -29,60 +29,82 @@ async function run() {
     const fitzeosCollection = client.db("fitzeosUserDb").collection("services");
     const fitzeosReviewCollection = client.db("fitzeosUserDb").collection("reviews");
     //server to ui data
-    app.get('/services', async(req,res)=> {
+    app.get('/services', async (req, res) => {
       const query = {}
-      const cursor = fitzeosCollection.find(query)
-      const result = await cursor.limit(3).toArray()
+      const sort = { _id: -1 };
+      const limit = 3;
+      const cursor = fitzeosCollection.find(query).sort(sort).limit(limit);
+      const result = await cursor.toArray()
+      // const result = results
       res.send(result)
     })
-    app.get('/servicesall', async(req,res)=> {
+    app.post('/services', async (req, res) => {
+      const service = req.body;
+      const result = await fitzeosCollection.insertOne(service)
+      res.send(result)
+    })
+    app.get('/servicesall', async (req, res) => {
       const query = {}
       const cursor = fitzeosCollection.find(query)
       const result = await cursor.toArray()
       res.send(result)
     })
-    app.get('/services/:id', async(req,res)=> {
-      const {id} = req.params;
-      const query = {_id : ObjectId(id)}
+    app.get('/services/:id', async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: ObjectId(id) }
       const result = await fitzeosCollection.findOne(query)
       res.send(result)
     })
     //ui to db data
-    app.get('/reviews', async(req,res) =>{
+    app.get('/reviews', async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {
-          email : req.query.email
+          email: req.query.email,
         }
       }
-
       const cursor = fitzeosReviewCollection.find(query)
       const result = await cursor.toArray()
       res.send(result)
-      console.log(req.query.email);
     })
-    
-    app.post('/reviews', async(req,res)=> {
+
+    app.post('/reviews', async (req, res) => {
       const review = req.body;
       const result = await fitzeosReviewCollection.insertOne(review)
       res.send(result)
-      console.log(result);
+
     })
-    app.get('/reviews', async(req,res)=> {
+    app.get('/reviews', async (req, res) => {
       const query = {}
       const cursor = fitzeosReviewCollection.find(query)
       const result = await cursor.toArray()
       res.send(result)
     })
 
-    
+    //spe new
+    app.get('/reviews/:id', async (req, res) => {
+      const id  = req.params.id;
+      const query = {reviewIds : id}
+      const result = await fitzeosReviewCollection.find(query).toArray()
+      res.send(result)
 
-    
+    })
+
+
+    //delete Review
+    app.delete('/reviews/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await fitzeosReviewCollection.deleteOne(query)
+      res.send(result)
+     
+    })
+
   } finally {
 
   }
 }
-run().catch(console.dir);
+run().catch(err => console.log(err));
 
 
 
