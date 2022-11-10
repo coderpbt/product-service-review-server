@@ -86,28 +86,31 @@ async function run() {
     app.get('/reviews/:id', async (req, res) => {
       const id  = req.params.id;
       const query = {reviewIds : id}
-      const result = await fitzeosReviewCollection.find(query).toArray()
+      const sort = { _id: -1 };
+      const result = await fitzeosReviewCollection.find(query).sort(sort).toArray()
       res.send(result)
 
     })
 
       //data update user
-      app.put('/reviews/:id', async (req,res) => {
+      app.patch('/reviews/:id', async (req,res) => {
         const id = req.params.id;
         const filter = { _id : ObjectId(id)};
         const user = req.body;
+        console.log('hello', user);
         const option = {upsert : true};
 
         const updsteUser = {
           $set : {
             name : user.name,
-            review : user.review
+            textarea : user.review
           }
         }
 
-        const result = await userCollection.updateOne(filter,updsteUser,option)
-        console.log(updsteUser);
+        const result = await fitzeosReviewCollection.updateOne(filter,updsteUser,option)
+        console.log(result);
         res.send(result)
+        
       })
 
 
